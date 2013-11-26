@@ -61,8 +61,8 @@ void test_package_install() {
 
   assert(0 == package_install(pkg, "./test/fixtures"));
   assert(0 == fs_exists("./test/fixtures/package.json"));
-
-
+  assert(0 == fs_exists("./test/fixtures/buffer.c"));
+  assert(0 == fs_exists("./test/fixtures/buffer.h"));
 }
 
 int main() {

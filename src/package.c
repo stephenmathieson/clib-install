@@ -10,6 +10,12 @@
 #include "str-replace.h"
 
 
+static void package_log(char *type, char *msg) {
+  int color = 36;
+  printf("  \033[%dm%10s\033[0m : \033[90m%s\033[m\n", color, type, msg);
+}
+
+
 /**
  * Build a `package` from the given `json`
  */
@@ -39,6 +45,8 @@ package_t *package_from_json(char *json) {
 
 package_t *package_from_repo(char *repo, char *version) {
   char *url = package_url(repo, version, "package.json");
+
+  package_log("fetch", url);
 
   response_t *res = http_get(url);
   if (!res->ok) return NULL;
@@ -78,6 +86,8 @@ int package_install(package_t *pkg, char *dir) {
     char *path = path_join(dir, basename(file));
     char *url = package_url(pkg->repo, pkg->version, file);
 
+    package_log("fetch", url);
+    package_log("save", path);
     if (-1 == http_get_file(url, path)) return -1;
 
     free(file);

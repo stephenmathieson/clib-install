@@ -88,11 +88,11 @@ int package_install(package_t *pkg, char *dir) {
 
     package_log("fetch", url);
     package_log("save", path);
-    if (-1 == http_get_file(url, path)) return -1;
-
+    rc = http_get_file(url, path);
     free(file);
     free(path);
     free(url);
+    if (-1 == rc) return -1;
   }
 
   // if deps are listed
@@ -101,15 +101,12 @@ int package_install(package_t *pkg, char *dir) {
       // iterate and install each of them
       char *name = (char *) json_object_get_name(pkg->dependencies, i);
       char *version = (char *) json_object_get_string(pkg->dependencies, name);
-
-      package_log("dep", name);
       package_t *dep = package_from_repo(name, version);
-
-      package_install(dep, dir);
-
+      rc = package_install(dep, dir);
       free(dep);
       free(name);
       free(version);
+      if (-1 == rc) return -1;
     }
   }
 

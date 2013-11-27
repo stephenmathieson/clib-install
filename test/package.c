@@ -63,7 +63,7 @@ void test_package_install() {
   package_t *pkg = package_from_repo("clibs/buffer", "0.2.0");
   assert(pkg);
   assert(0 == package_install(pkg, "./test/fixtures"));
-  assert(0 == fs_exists("./test/fixtures/package.json"));
+  assert(-1 == fs_exists("./test/fixtures/package.json"));
   assert(0 == fs_exists("./test/fixtures/buffer.c"));
   assert(0 == fs_exists("./test/fixtures/buffer.h"));
   free(pkg);

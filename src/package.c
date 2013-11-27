@@ -73,13 +73,6 @@ char *package_url(char *repo, char *version, char *file) {
 int package_install(package_t *pkg, char *dir) {
   int rc;
 
-  char *package_json = path_join(dir, "package.json");
-  rc = fs_write(package_json, pkg->json_string);
-  free(package_json);
-  if (-1 == rc) {
-    return -1;
-  }
-
   for (int i = 0; i < json_array_get_count(pkg->src); ++i) {
     char *file = (char *) json_array_get_string(pkg->src, i);
     char *path = path_join(dir, basename(file));

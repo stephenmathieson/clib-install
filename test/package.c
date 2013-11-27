@@ -107,7 +107,31 @@ void test_package_install_dependencies() {
   assert(0 == fs_exists("./test/fixtures/path-normalize.c"));
   assert(0 == fs_exists("./test/fixtures/path-normalize.h"));
   free(pkg);
+}
 
+
+void test_package_install_neseted_dependencies() {
+  package_t *pkg = package_from_repo("stephenmathieson/rimraf.c", "temp-deps");
+  assert(pkg);
+  // ensure we've got the right pkg
+  assert(0 == strcmp("src/rimraf.c", json_array_get_string(pkg->src, 0)));
+  assert(0 == strcmp("src/rimraf.h", json_array_get_string(pkg->src, 1)));
+
+  assert(0 == package_install(pkg, "./test/fixtures"));
+  // sources
+  assert(0 == fs_exists("./test/fixtures/rimraf.c"));
+  assert(0 == fs_exists("./test/fixtures/rimraf.h"));
+  // deps
+  assert(0 == fs_exists("./test/fixtures/path-join.h"));
+  assert(0 == fs_exists("./test/fixtures/path-join.c"));
+  // deps' deps
+  assert(0 == fs_exists("./test/fixtures/str-copy.h"));
+  assert(0 == fs_exists("./test/fixtures/str-copy.c"));
+  assert(0 == fs_exists("./test/fixtures/str-ends-with.h"));
+  assert(0 == fs_exists("./test/fixtures/str-ends-with.c"));
+  assert(0 == fs_exists("./test/fixtures/str-starts-with.h"));
+  assert(0 == fs_exists("./test/fixtures/str-starts-with.c"));
+  free(pkg);
 }
 
 
@@ -118,6 +142,6 @@ int main() {
   test_package_install();
   test_package_install_basename();
   test_package_install_binary();
-  test_package_install_dependencies();
+  test_package_install_neseted_dependencies();
   return 0;
 }

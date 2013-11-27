@@ -14,4 +14,5 @@ int main() {
 
   assert(0 == http_get_file("http://google.com", "./google.html"));
   assert(0 == fs_exists("./google.html"));
+  return 0;
 }

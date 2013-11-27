@@ -78,14 +78,11 @@ int package_install(package_t *pkg, char *dir) {
     char *path = path_join(dir, basename(file));
     char *url = package_url(pkg->repo, pkg->version, file);
 
-    response_t *res = http_get(url);
-    if (!res->ok) return -1;
-    if (-1 == fs_write(path, res->text)) return -1;
+    if (-1 == http_get_file(url, path)) return -1;
 
     free(file);
     free(path);
     free(url);
-    free(res);
   }
 
   return 0;

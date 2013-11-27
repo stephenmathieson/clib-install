@@ -90,6 +90,27 @@ void test_package_install_binary() {
   free(pkg);
 }
 
+void test_package_install_dependencies() {
+  package_t *pkg = package_from_repo("stephenmathieson/mkdirp.c", "temp-deps");
+  assert(pkg);
+  // ensure we've got the right pkg
+  assert(0 == strcmp("src/mkdirp.c", json_array_get_string(pkg->src, 0)));
+  assert(0 == strcmp("src/mkdirp.h", json_array_get_string(pkg->src, 1)));
+
+  assert(0 == package_install(pkg, "./test/fixtures"));
+  // sources
+  assert(0 == fs_exists("./test/fixtures/mkdirp.c"));
+  assert(0 == fs_exists("./test/fixtures/mkdirp.h"));
+  // deps
+  assert(0 == fs_exists("./test/fixtures/str-copy.c"));
+  assert(0 == fs_exists("./test/fixtures/str-copy.h"));
+  assert(0 == fs_exists("./test/fixtures/path-normalize.c"));
+  assert(0 == fs_exists("./test/fixtures/path-normalize.h"));
+  free(pkg);
+
+}
+
+
 int main() {
   test_package_from_json();
   test_package_url();
@@ -97,5 +118,6 @@ int main() {
   test_package_install();
   test_package_install_basename();
   test_package_install_binary();
+  test_package_install_dependencies();
   return 0;
 }

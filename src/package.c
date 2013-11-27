@@ -95,6 +95,24 @@ int package_install(package_t *pkg, char *dir) {
     free(url);
   }
 
+  // if deps are listed
+  if (pkg->dependencies) {
+    for (int i = 0; i < json_object_get_count(pkg->dependencies); ++i) {
+      // iterate and install each of them
+      char *name = (char *) json_object_get_name(pkg->dependencies, i);
+      char *version = (char *) json_object_get_string(pkg->dependencies, name);
+
+      package_log("dep", name);
+      package_t *dep = package_from_repo(name, version);
+
+      package_install(dep, dir);
+
+      free(dep);
+      free(name);
+      free(version);
+    }
+  }
+
   return 0;
 }
 

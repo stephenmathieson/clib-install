@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <libgen.h>
 #include <stdlib.h>
 #include "http-get.h"
 #include "fs.h"
@@ -81,12 +82,13 @@ int package_install(package_t *pkg, char *dir) {
 
   for (int i = 0; i < json_array_get_count(pkg->src); ++i) {
     char *file = (char *) json_array_get_string(pkg->src, i);
-    char *path = path_join(dir, file);
+    char *path = path_join(dir, basename(file));
     char *url = package_url(pkg->repo, pkg->version, file);
 
     response_t *res = http_get(url);
     if (!res->ok) return -1;
     if (-1 == fs_write(path, res->text)) return -1;
+
     free(file);
     free(path);
     free(url);

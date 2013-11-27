@@ -69,6 +69,20 @@ void test_package_install() {
   free(pkg);
 }
 
+void test_package_install_basename() {
+  package_t *pkg = package_from_repo("stephenmathieson/case.c", "0.1.0");
+  assert(pkg);
+  // ensure we've got the right pkg
+  assert(0 == strcmp("src/case.c", json_array_get_string(pkg->src, 0)));
+  assert(0 == strcmp("src/case.h", json_array_get_string(pkg->src, 1)));
+
+  assert(0 == package_install(pkg, "./test/fixtures"));
+  // verify we're `basename`-ing the source files
+  assert(0 == fs_exists("./test/fixtures/case.c"));
+  assert(0 == fs_exists("./test/fixtures/case.h"));
+  free(pkg);
+}
+
 void test_package_install_binary() {
   package_t *pkg = package_from_repo("stephenmathieson/tabs-to-spaces", "master");
   assert(pkg);
@@ -81,6 +95,7 @@ int main() {
   test_package_url();
   test_package_from_repo();
   test_package_install();
+  test_package_install_basename();
   test_package_install_binary();
   return 0;
 }

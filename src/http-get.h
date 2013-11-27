@@ -10,4 +10,6 @@ typedef struct {
 
 response_t *http_get(char *url);
 
+int http_get_file(char *url, char *file);
+
 #endif

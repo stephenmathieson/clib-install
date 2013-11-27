@@ -69,10 +69,18 @@ void test_package_install() {
   free(pkg);
 }
 
+void test_package_install_binary() {
+  package_t *pkg = package_from_repo("stephenmathieson/tabs-to-spaces", "master");
+  assert(pkg);
+  assert(0 == package_install_binary(pkg));
+  free(pkg);
+}
+
 int main() {
   test_package_from_json();
   test_package_url();
   test_package_from_repo();
   test_package_install();
+  test_package_install_binary();
   return 0;
 }

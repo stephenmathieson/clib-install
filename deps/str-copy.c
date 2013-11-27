@@ -13,6 +13,7 @@
 char *str_copy(char *str) {
   int len = strlen(str) + 1;
   char *buf = (char *) malloc(len * sizeof(char *));
+  if (NULL == buf) return NULL;
   memcpy(buf, str, len);
   return buf;
 }

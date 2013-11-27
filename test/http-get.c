@@ -1,5 +1,7 @@
 
 #include <assert.h>
+#include <stdlib.h>
+#include "fs.h"
 #include "http-get.h"
 
 int main() {
@@ -8,4 +10,8 @@ int main() {
   assert(res->text);
   assert(res->ok);
   assert(200 == res->status);
+  free(res);
+
+  assert(0 == http_get_file("http://google.com", "./google.html"));
+  assert(0 == fs_exists("./google.html"));
 }

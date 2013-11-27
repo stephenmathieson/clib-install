@@ -38,3 +38,42 @@ response_t *http_get(char *url) {
 
   return res;
 }
+
+
+/**
+ * HTTP GET file write callback
+ */
+
+static size_t http_get_file_cb(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+  return fwrite(ptr, size, nmemb, stream);
+}
+
+/**
+ * Request `url` and save to `file`
+ */
+
+int http_get_file(char *url, char *file) {
+  CURL *req = curl_easy_init();
+  if (!req) return -1;
+
+  FILE *fp = fopen(file, "wb");
+  if (!fp) return -1;
+
+  curl_easy_setopt(req, CURLOPT_URL, url);
+  curl_easy_setopt(req, CURLOPT_FOLLOWLOCATION, 1);
+  curl_easy_setopt(req, CURLOPT_WRITEFUNCTION, http_get_file_cb);
+  curl_easy_setopt(req, CURLOPT_WRITEDATA, fp);
+  int res = curl_easy_perform(req);
+
+  long status;
+  curl_easy_getinfo(req, CURLINFO_RESPONSE_CODE, &status);
+
+  curl_easy_cleanup(req);
+  fclose(fp);
+
+  if (200 == status && CURLE_ABORTED_BY_CALLBACK != res) {
+    return 0;
+  }
+
+  return -1;
+}

@@ -174,29 +174,31 @@ char *package_tarball(char *repo, char *version) {
  */
 
 void package_inspect(package_t *pkg) {
-  printf("%s: %s\n", "name", pkg->name);
-  printf("%s: %s\n", "version", pkg->version);
-  printf("%s: %s\n", "repo", pkg->repo);
-  printf("%s: %s\n", "license", pkg->license);
-  printf("%s: %s\n", "description", pkg->description);
+  printf("%s\n", pkg->json_string);
 
-  if (pkg->dependencies) {
-    printf("%s:\n", "dependencies");
-    for (int i = 0; i < json_object_get_count(pkg->dependencies); ++i) {
-      char *name = (char *) json_object_get_name(pkg->dependencies, i);
-      char *version = (char *) json_object_get_string(pkg->dependencies, name);
-      printf("  %s: %s\n", name, version);
-      free(name);
-      free(version);
-    }
-  }
+  // printf("%s: %s\n", "name", pkg->name);
+  // printf("%s: %s\n", "version", pkg->version);
+  // printf("%s: %s\n", "repo", pkg->repo);
+  // printf("%s: %s\n", "license", pkg->license);
+  // printf("%s: %s\n", "description", pkg->description);
 
-  printf("%s:\n", "src");
-  for (int i = 0; i < json_array_get_count(pkg->src); ++i) {
-    printf("  %s\n", json_array_get_string(pkg->src, i));
-  }
+  // if (pkg->dependencies) {
+  //   printf("%s:\n", "dependencies");
+  //   for (int i = 0; i < json_object_get_count(pkg->dependencies); ++i) {
+  //     char *name = (char *) json_object_get_name(pkg->dependencies, i);
+  //     char *version = (char *) json_object_get_string(pkg->dependencies, name);
+  //     printf("  %s: %s\n", name, version);
+  //     free(name);
+  //     free(version);
+  //   }
+  // }
 
-  if (pkg->install) {
-    printf("  %s: %s\n", "install", pkg->install);
-  }
+  // printf("%s:\n", "src");
+  // for (int i = 0; i < json_array_get_count(pkg->src); ++i) {
+  //   printf("  %s\n", json_array_get_string(pkg->src, i));
+  // }
+
+  // if (pkg->install) {
+  //   printf("  %s: %s\n", "install", pkg->install);
+  // }
 }

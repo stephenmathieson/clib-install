@@ -186,6 +186,7 @@ int package_install_binary(package_t *pkg) {
   char *tarball = malloc(sizeof(char) * 256);
   if (NULL == tarball) {
     package_error("error", "failed to allocate enough memory");
+    free(url);
     return -1;
   }
 
@@ -213,6 +214,7 @@ int package_install_binary(package_t *pkg) {
   code = system(command);
   if (0 != code) {
     package_error("error", "tar returned %d", code);
+    free(command);
     return code;
   }
 
@@ -223,7 +225,9 @@ int package_install_binary(package_t *pkg) {
     , pkg->version
     , pkg->install);
 
-  return system(command);
+  code = system(command);
+  free(command);
+  return code;
 }
 
 /**

@@ -1,4 +1,11 @@
 
+//
+// package.h
+//
+// Copyright (c) 2013 Stephen Mathieson
+// MIT licensed
+//
+
 #ifndef _PACKAGE_H_
 #define _PACKAGE_H_ 1
 

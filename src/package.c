@@ -1,4 +1,11 @@
 
+//
+// package.c
+//
+// Copyright (c) 2013 Stephen Mathieson
+// MIT licensed
+//
+
 #include <stdio.h>
 #include <libgen.h>
 #include <stdlib.h>

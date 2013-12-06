@@ -1,4 +1,11 @@
 
+//
+// main.c
+//
+// Copyright (c) 2013 Stephen Mathieson
+// MIT licensed
+//
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "clib-install.h"

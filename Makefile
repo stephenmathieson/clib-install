@@ -1,14 +1,25 @@
 
-LDLIBS = -lcurl
-LDDEPS = -Ideps -Isrc
+CC ?= cc
+BIN ?= clib-install
+CFLAGS = -std=c99 -Wall -Ideps -Isrc
+LDFLAGS = -lcurl
+SRC = $(filter-out src/main.c, $(wildcard src/*.c))
+SRC += $(wildcard deps/*.c)
 TESTS = $(wildcard test/*.c)
-SOURCES = $(wildcard src/*.c)
-SOURCES += $(wildcard deps/*.c)
 
-test: $(TESTS)
-	@$(foreach test, $(TESTS), ./$(basename $(test)) && echo " ✓ $(basename $(test))";)
+build: SRC += src/main.c
+build: $(BIN)
+
+$(BIN): $(SRC)
+	$(CC) $(SRC) $(CFLAGS) $(LDFLAGS) -o $(BIN)
+
+test: clean $(TESTS)
 
 $(TESTS):
-	$(CC) -std=c99 $(SOURCES) $@ $(LDLIBS) $(LDDEPS) -o $(basename $@)
+	$(CC) $@ $(SRC) $(CFLAGS) $(LDFLAGS) -o $(basename $@)
+	./$(basename $@)
+
+clean:
+	$(foreach test, $(TESTS), rm -f $(basename $(test));)
 
 .PHONY: test $(TESTS)

@@ -91,21 +91,19 @@ void test_package_install_binary() {
 }
 
 void test_package_install_dependencies() {
-  package_t *pkg = package_from_repo("stephenmathieson/mkdirp.c", "temp-deps");
+  package_t *pkg = package_from_repo("stephenmathieson/mkdirp.c", "master");
   assert(pkg);
   // ensure we've got the right pkg
   assert(0 == strcmp("src/mkdirp.c", json_array_get_string(pkg->src, 0)));
   assert(0 == strcmp("src/mkdirp.h", json_array_get_string(pkg->src, 1)));
 
-  assert(0 == package_install(pkg, "./test/fixtures"));
-  // sources
-  assert(0 == fs_exists("./test/fixtures/mkdirp.c"));
-  assert(0 == fs_exists("./test/fixtures/mkdirp.h"));
+  assert(0 == package_install_dependencies(pkg, "./test/fixtures/mkdirp-deps"));
+  // sources should not exist
+  assert(-1 == fs_exists("./test/fixtures/mkdirp-deps/mkdirp.c"));
+  assert(-1 == fs_exists("./test/fixtures/mkdirp-deps/mkdirp.h"));
   // deps
-  assert(0 == fs_exists("./test/fixtures/str-copy.c"));
-  assert(0 == fs_exists("./test/fixtures/str-copy.h"));
-  assert(0 == fs_exists("./test/fixtures/path-normalize.c"));
-  assert(0 == fs_exists("./test/fixtures/path-normalize.h"));
+  assert(0 == fs_exists("./test/fixtures/mkdirp-deps/path-normalize.c"));
+  assert(0 == fs_exists("./test/fixtures/mkdirp-deps/path-normalize.h"));
   free(pkg);
 }
 
@@ -125,8 +123,6 @@ void test_package_install_neseted_dependencies() {
   assert(0 == fs_exists("./test/fixtures/path-join.h"));
   assert(0 == fs_exists("./test/fixtures/path-join.c"));
   // deps' deps
-  assert(0 == fs_exists("./test/fixtures/str-copy.h"));
-  assert(0 == fs_exists("./test/fixtures/str-copy.c"));
   assert(0 == fs_exists("./test/fixtures/str-ends-with.h"));
   assert(0 == fs_exists("./test/fixtures/str-ends-with.c"));
   assert(0 == fs_exists("./test/fixtures/str-starts-with.h"));
@@ -134,14 +130,53 @@ void test_package_install_neseted_dependencies() {
   free(pkg);
 }
 
+void test_package_install_specified_version() {
+  package_t *pkg = package_from_repo("stephenmathieson/mkdirp.c", "temp-deps");
+  assert(pkg);
+
+  assert(0 == package_install(pkg, "./test/fixtures/mkdirp-temp-deps"));
+  // sources
+  assert(0 == fs_exists("./test/fixtures/mkdirp-temp-deps/mkdirp.c"));
+  assert(0 == fs_exists("./test/fixtures/mkdirp-temp-deps/mkdirp.h"));
+  // deps
+  assert(0 == fs_exists("./test/fixtures/mkdirp-temp-deps/str-copy.c"));
+  assert(0 == fs_exists("./test/fixtures/mkdirp-temp-deps/str-copy.h"));
+  assert(0 == fs_exists("./test/fixtures/mkdirp-temp-deps/path-normalize.c"));
+  assert(0 == fs_exists("./test/fixtures/mkdirp-temp-deps/path-normalize.h"));
+  free(pkg);
+
+}
+
+void test_package_install_creates_dir() {
+  package_t *pkg = package_from_repo("stephenmathieson/mkdirp.c", "master");
+  assert(pkg);
+
+  assert(0 == package_install(pkg, "./test/fixtures/mkdirp"));
+  // sources
+  assert(0 == fs_exists("./test/fixtures/mkdirp/mkdirp.c"));
+  assert(0 == fs_exists("./test/fixtures/mkdirp/mkdirp.h"));
+  // deps
+  assert(0 == fs_exists("./test/fixtures/mkdirp/path-normalize.c"));
+  assert(0 == fs_exists("./test/fixtures/mkdirp/path-normalize.h"));
+  free(pkg);
+}
+
+void test_package_from_repo_404() {
+  package_t *pkg = package_from_repo("stephenmathieson/notreal.c", "4.3.2");
+  assert(NULL == pkg);
+}
 
 int main() {
   test_package_from_json();
   test_package_url();
   test_package_from_repo();
+  test_package_from_repo_404();
   test_package_install();
   test_package_install_basename();
   test_package_install_binary();
+  test_package_install_dependencies();
   test_package_install_neseted_dependencies();
+  test_package_install_creates_dir();
+  test_package_install_specified_version();
   return 0;
 }

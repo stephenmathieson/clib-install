@@ -5,28 +5,30 @@
 #include "parson.h"
 
 typedef struct {
-  char *name;
-  char *version;
-  char *repo;
-  char *description;
-  char *license;
-  char *install;
+  const char *name;
+  const char *version;
+  const char *repo;
+  const char *description;
+  const char *license;
+  const char *install;
   JSON_Object *dependencies;
   JSON_Array *src;
   JSON_Array *keywords;
   JSON_Object *json;
-  char *json_string;
+  const char *json_string;
 } package_t;
 
-package_t *package_from_json(char *json);
+package_t *package_from_json(const char *json);
 
-package_t *package_from_repo(char *repo, char *version);
+package_t *package_from_repo(const char *repo, const char *version);
 
-char *package_url(char *repo, char *version, char *file);
+char *package_url(const char *repo, const char *version, const char *file);
 
-char *package_tarball(char *repo, char *vesrion);
+char *package_tarball(const char *repo, const char *vesrion);
 
-int package_install(package_t *pkg, char *dir);
+int package_install(package_t *pkg, const char *dir);
+
+int package_install_dependencies(package_t *pkg, const char *dir);
 
 int package_install_binary(package_t *pkg);
 

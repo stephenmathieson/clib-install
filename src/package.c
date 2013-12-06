@@ -110,6 +110,9 @@ char *package_url(const char *repo, const char *version, const char *file) {
     package_error("error", "failed to allocate enough memory");
     return NULL;
   }
+
+  // TODO if "*" == version, version = "master"
+
   sprintf(buf
     , "https://raw.github.com/%s/%s/%s"
     , repo
@@ -250,6 +253,9 @@ char *package_tarball(const char *repo, const char *version) {
     package_error("error", "failed to allocate enough memory");
     return NULL;
   }
+
+  // TODO if "*" == version, version = "master"
+
   sprintf(buf
     , "https://github.com/%s/archive/%s.tar.gz"
     , repo

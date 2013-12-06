@@ -22,14 +22,20 @@
 ## Examples
 
   Install local dependencies
+
     $ clib-install
 
   Install stephenmathieson/trim.c
+  
     $ clib-install stephenmathieson/trim.c
 
   Install stephenmathieson/trim.c and jwerle/fs.c
+  
     $ clib-install stephenmathieson/trim.c jwerle/fs.c
 
+  Install clibs/ms@0.0.3 and clibs/file
+
+    $ clib-install ms@0.0.3 file
 
 ## License
 

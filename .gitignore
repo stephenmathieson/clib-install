@@ -1,2 +1,4 @@
-test/fixtures/*.*
+test/fixtures/
 clib-install
+test/http-get
+test/package

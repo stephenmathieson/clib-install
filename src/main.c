@@ -1,15 +1,27 @@
 
+#include <stdio.h>
+#include <stdlib.h>
+#include "clib-install.h"
 #include "fs.h"
+#include "commander.h"
 #include "package.h"
 
 
 // global opts
 struct options {
   const char *dir;
-  int verbose;
 };
 
 static struct options opts;
+
+/**
+ * Option setters
+ */
+
+static void setopt_dir(command_t *self) {
+  opts.dir = (char *) self->arg;
+}
+
 
 /**
  * Install dependencies of the package at ./
@@ -18,35 +30,36 @@ static struct options opts;
 static int install_local_pkg() {
   if (-1 == fs_exists("./package.json")) {
     fprintf(stderr, "Missing package.json\n");
-    return -1;
+    return 1;
   }
 
   char *json = fs_read("./package.json");
-  if (NULL == json) return -1;
+  if (NULL == json) return 1;
 
   package_t *pkg = package_from_json(json);
   if (!pkg) {
     fprintf(stderr, "Could not create package.  Perhaps package.json is malformed?\n");
-    return -1;
+    return 1;
   }
 
-  if (-1 == package_install_dependencies(pkg, opts.dir)) {
-    fprintf(stderr, "Could not install local dependencies\n");
-    return -1;
-  }
+  int rc = package_install_dependencies(pkg, opts.dir);
+  if (-1 == rc) fprintf(stderr, "Could not install local dependencies\n");
 
-  return 0;
+  free(pkg);
+  return -1 == rc ? 1 : 0;
 }
 
 /**
- * Install `n - 1` of the given `pkgs` (args)
+ * Install `n` of the given `pkgs` (args)
  */
 
-static int install_packages(int n, char const *pkgs[]) {
+static int install_packages(int n, const char **pkgs) {
   for (int i = 1; i < n; i++) {
     package_t *pkg = package_from_repo(pkgs[i], "master");
     if (!pkg) return 1;
-    if (-1 == package_install(pkg, opts.dir)) return 1;
+    int rc = package_install(pkg, opts.dir);
+    free(pkg);
+    if (-1 == rc) return 1;
   }
 
   return 0;
@@ -56,15 +69,20 @@ static int install_packages(int n, char const *pkgs[]) {
  * Entry point
  */
 
-int main(int argc, char const *argv[]) {
+int main(int argc, const char **argv) {
+  command_t program;
+  command_init(&program, "clib-install", CLIB_INSTALL_VERSION);
 
-  // TODO parse argv for options (commander?)
+  program.usage = "[options] [name ...]";
 
-  opts.dir = "./deps";
+  command_option(&program
+    , "-o"
+    , "--out <dir>"
+    , "change the output directory [deps]"
+    , setopt_dir);
+  command_parse(&program, argc, argv);
 
-  if (1 == argc) {
-    return -1 == install_local_pkg() ? 1 : 0;
-  }
+  if (0 == program.argc) return install_local_pkg();
 
-  return install_packages(argc, argv);
+  return install_packages(program.argc, program.argv);
 }

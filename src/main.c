@@ -61,7 +61,9 @@ static int install_local_pkg() {
  */
 
 static int install_packages(int n, const char **pkgs) {
-  for (int i = 1; i < n; i++) {
+  for (int i = 0; i < n; i++) {
+    // TODO support for `clib-install ms file ....`
+    // TODO support for `clib-install repo@version`
     package_t *pkg = package_from_repo(pkgs[i], "master");
     if (!pkg) return 1;
     int rc = package_install(pkg, opts.dir);

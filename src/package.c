@@ -51,7 +51,7 @@ package_t *package_from_repo(char *repo, char *version) {
   response_t *res = http_get(url);
   if (!res->ok) return NULL;
 
-  package_t *pkg = package_from_json(res->text);
+  package_t *pkg = package_from_json(res->data);
 
   free(url);
   free(res);

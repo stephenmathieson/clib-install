@@ -5,7 +5,31 @@
 
 ## Disclaimer
 
-  This is a WIP.  It is (very) unstable and its API is likely to change!
+  This is a WIP!!
+
+## Usage
+
+```
+  Usage: clib-install [options] [name ...]
+
+  Options:
+
+    -V, --version                 output program version
+    -h, --help                    output help information
+    -o, --out <dir>               change the output directory [deps]
+```
+
+## Examples
+
+  Install local dependencies
+    $ clib-install
+
+  Install stephenmathieson/trim.c
+    $ clib-install stephenmathieson/trim.c
+
+  Install stephenmathieson/trim.c and jwerle/fs.c
+    $ clib-install stephenmathieson/trim.c jwerle/fs.c
+
 
 ## License
 

@@ -18,6 +18,9 @@
 #include "str-replace.h"
 #include "mkdirp.h"
 
+/**
+ * Debug/log functions
+ */
 
 static void package_debug(const char *type, const char *msg, int color) {
   printf("  \033[%dm%10s\033[0m : \033[90m%s\033[m\n", color, type, msg);

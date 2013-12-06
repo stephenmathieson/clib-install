@@ -89,6 +89,10 @@ int main(int argc, const char **argv) {
     , setopt_dir);
   command_parse(&program, argc, argv);
 
+  if (!opts.dir) {
+    opts.dir = "./deps";
+  }
+
   if (0 == program.argc) return install_local_pkg();
 
   return install_packages(program.argc, program.argv);

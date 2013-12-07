@@ -1,4 +1,11 @@
 
+//
+// parse-repo.h
+//
+// Copyright (c) 2013 Stephen Mathieson
+// MIT licensed
+//
+
 #ifndef __PARSE_REPO__
 #define __PARSE_REPO__ 1
 
@@ -9,8 +16,12 @@ typedef struct {
   const char *owner;
   const char *name;
   const char *version;
+  char *slug;
 } parsed_repo_t;
 
 parsed_repo_t *parse_repo(const char *str);
+
+void parse_repo_free(parsed_repo_t *repo);
+
 
 #endif

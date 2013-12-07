@@ -65,17 +65,11 @@ static int install_local_pkg() {
 static int install_packages(int n, const char **pkgs) {
   for (int i = 0; i < n; i++) {
     parsed_repo_t *repo = parse_repo(pkgs[i]);
-    char *slug = malloc(256);
-    sprintf(slug
-      , "%s/%s"
-      , repo->owner
-      , repo->name);
-    package_t *pkg = package_from_repo(slug, repo->version);
+    package_t *pkg = package_from_repo(repo->slug, repo->version);
     if (!pkg) return 1;
     int rc = package_install(pkg, opts.dir);
     free(pkg);
-    free(slug);
-    free(repo);
+    parse_repo_free(repo);
     if (-1 == rc) return 1;
   }
 
@@ -99,10 +93,7 @@ int main(int argc, const char **argv) {
     , setopt_dir);
   command_parse(&program, argc, argv);
 
-  if (!opts.dir) {
-    opts.dir = "./deps";
-  }
-
+  if (!opts.dir) opts.dir = "./deps";
   if (0 == program.argc) return install_local_pkg();
 
   return install_packages(program.argc, program.argv);

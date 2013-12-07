@@ -57,10 +57,15 @@ package_t *package_from_json(const char *json) {
   }
 
   JSON_Value *root = json_parse_string(json);
+  if (NULL == root) {
+    package_error("error", "failed to parse json");
+    return NULL;
+  }
   pkg->json = json_value_get_object(root);
   pkg->json_string = json;
   pkg->name = json_object_dotget_string(pkg->json, "name");
   pkg->repo = json_object_dotget_string(pkg->json, "repo");
+  // TODO support npm-style "repository"
   pkg->version = json_object_dotget_string(pkg->json, "version");
   pkg->license = json_object_dotget_string(pkg->json, "license");
   pkg->description = json_object_dotget_string(pkg->json, "description");

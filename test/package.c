@@ -166,6 +166,14 @@ void test_package_from_repo_404() {
   assert(NULL == pkg);
 }
 
+void test_package_from_json_broken_json() {
+  char json[] = "{"
+                "  ,"
+                "}";
+  package_t *pkg = package_from_json(json);
+  assert(NULL == pkg);
+}
+
 int main() {
   test_package_from_json();
   test_package_url();
@@ -178,5 +186,6 @@ int main() {
   test_package_install_neseted_dependencies();
   test_package_install_creates_dir();
   test_package_install_specified_version();
+  test_package_from_json_broken_json();
   return 0;
 }

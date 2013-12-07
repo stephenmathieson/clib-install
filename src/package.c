@@ -265,7 +265,11 @@ int package_install_binary(package_t *pkg) {
  * Get a URL for the `repo`'s tarball at `version`
  */
 
-char *package_tarball(const char *repo, const char *version) {
+char *package_tarball(const char *repo, const char *_version) {
+  // * -> master
+  char *version = 0 == strcmp("*", _version)
+        ? "master"
+        : strdup(_version);
   char *buf = malloc(sizeof(char) * 256);
   if (NULL == buf) {
     package_error("error", "failed to allocate enough memory");

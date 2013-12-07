@@ -84,7 +84,7 @@ void test_package_install_basename() {
 }
 
 void test_package_install_binary() {
-  package_t *pkg = package_from_repo("stephenmathieson/tabs-to-spaces", "master");
+  package_t *pkg = package_from_repo("stephenmathieson/tabs-to-spaces", "*");
   assert(pkg);
   assert(0 == package_install_binary(pkg));
   free(pkg);

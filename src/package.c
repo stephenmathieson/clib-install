@@ -91,6 +91,10 @@ package_t *package_from_repo(const char *repo, const char *version) {
     package_error("error", "failed to create package from json");
     return NULL;
   }
+
+  // support for missing repo in package.json
+  if (!pkg->repo) pkg->repo = repo;
+
   // dep@master may have the version x.y.z, so we
   // must force the provided version
   pkg->version = version;

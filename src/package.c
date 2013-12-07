@@ -60,6 +60,7 @@ package_t *package_from_json(const char *json) {
   JSON_Value *root = json_parse_string(json);
   if (NULL == root) {
     package_error("error", "failed to parse json");
+    free(pkg);
     return NULL;
   }
   pkg->json = json_value_get_object(root);

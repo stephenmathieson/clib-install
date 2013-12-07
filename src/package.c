@@ -86,7 +86,6 @@ package_t *package_from_repo(const char *repo, const char *_version) {
   char *version = 0 == strcmp("*", _version)
         ? "master"
         : strdup(_version);
-
   char *url = package_url(repo, version, "package.json");
 
   package_log("fetch", url);
@@ -94,12 +93,14 @@ package_t *package_from_repo(const char *repo, const char *_version) {
   response_t *res = http_get(url);
   if (!res->ok) {
     package_error("error", "failed to get %s", url);
+    free(url);
+    return NULL;
   }
-  if (!res->ok) return NULL;
 
   package_t *pkg = package_from_json(res->data);
   if (NULL == pkg) {
     package_error("error", "failed to create package from json");
+    free(url);
     return NULL;
   }
 
@@ -147,6 +148,8 @@ int package_install(package_t *pkg, const char *dir) {
     package_error("error", "failed to mkdir %s", dir);
     return -1;
   }
+
+  // TODO save package.json
 
   for (int i = 0; i < json_array_get_count(pkg->src); ++i) {
     char *file = (char *) json_array_get_string(pkg->src, i);

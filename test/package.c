@@ -20,7 +20,7 @@ void test_package_from_json() {
                 "    \"foo.h\","
                 "    \"foo.c\""
                 "  ]"
-                "}\0";
+                "}";
   package_t *pkg = package_from_json(json);
   assert(pkg);
   assert(0 == strcmp(json, pkg->json_string));
@@ -174,6 +174,23 @@ void test_package_from_json_broken_json() {
   assert(NULL == pkg);
 }
 
+void test_package_from_repo_version_star() {
+  package_t *pkg = package_from_repo("stephenmathieson/mkdirp.c", "*");
+  assert(pkg);
+  assert(0 == strcmp("master", pkg->version));
+
+  assert(0 == package_install(pkg, "./test/fixtures/mkdirp-star"));
+  // sources
+  assert(0 == fs_exists("./test/fixtures/mkdirp-star/mkdirp.c"));
+  assert(0 == fs_exists("./test/fixtures/mkdirp-star/mkdirp.h"));
+  // deps
+  assert(0 == fs_exists("./test/fixtures/mkdirp-star/path-normalize.c"));
+  assert(0 == fs_exists("./test/fixtures/mkdirp-star/path-normalize.h"));
+  free(pkg);
+
+}
+
+
 int main() {
   test_package_from_json();
   test_package_url();
@@ -187,5 +204,6 @@ int main() {
   test_package_install_creates_dir();
   test_package_install_specified_version();
   test_package_from_json_broken_json();
+  test_package_from_repo_version_star();
   return 0;
 }

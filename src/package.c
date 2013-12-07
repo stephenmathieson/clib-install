@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <libgen.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include "http-get.h"
@@ -80,7 +81,12 @@ package_t *package_from_json(const char *json) {
  * Build a `package` from the given `repo` at tag `version`
  */
 
-package_t *package_from_repo(const char *repo, const char *version) {
+package_t *package_from_repo(const char *repo, const char *_version) {
+  // * -> master
+  char *version = 0 == strcmp("*", _version)
+        ? "master"
+        : strdup(_version);
+
   char *url = package_url(repo, version, "package.json");
 
   package_log("fetch", url);
@@ -114,20 +120,17 @@ package_t *package_from_repo(const char *repo, const char *version) {
  */
 
 char *package_url(const char *repo, const char *version, const char *file) {
-  char *buf = malloc(sizeof(char) * 256);
-  if (NULL == buf) {
+  char *url = malloc(sizeof(char) * 256);
+  if (NULL == url) {
     package_error("error", "failed to allocate enough memory");
     return NULL;
   }
-
-  // TODO if "*" == version, version = "master"
-
-  sprintf(buf
+  sprintf(url
     , "https://raw.github.com/%s/%s/%s"
     , repo
     , version
     , file);
-  return buf;
+  return url;
 }
 
 /**
@@ -136,6 +139,8 @@ char *package_url(const char *repo, const char *version, const char *file) {
 
 int package_install(package_t *pkg, const char *dir) {
   int rc;
+
+  // TODO install in dir/{pkg.name}
 
   rc = mkdirp(dir, 0777);
   if (-1 == rc) {

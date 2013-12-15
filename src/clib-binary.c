@@ -66,8 +66,31 @@ clib_package_install_binary(clib_package_t *pkg, int verbose) {
     return rc;
   }
 
+  char *dir = malloc(256);
+  if (NULL == dir) {
+    free(url);
+    free(file);
+    free(tarball);
+    free(command);
+    return rc;
+  }
+
+
+  sprintf(dir, "/tmp/%s-%s", pkg->name, pkg->version);
+
+  if (pkg->dependencies) {
+    rc = clib_package_install_dependencies(pkg, dir, 1);
+    if (0 != rc) {
+      free(url);
+      free(file);
+      free(tarball);
+      free(command);
+      return rc;
+    }
+  }
+
   // cheap install
-  sprintf(command, "cd /tmp/%s-%s && %s", pkg->name, pkg->version, pkg->install);
+  sprintf(command, "cd %s && %s", dir, pkg->install);
 
   rc = system(command);
 

@@ -5,7 +5,7 @@ PREFIX ?= /usr/local
 CFLAGS = -std=c99 -Wall -Ideps -Isrc
 LDFLAGS = -lcurl
 SRC = $(filter-out src/main.c, $(wildcard src/*.c))
-SRC += $(wildcard deps/*.c)
+SRC += $(wildcard deps/*/*.c)
 TESTS = $(wildcard test/*.c)
 
 $(BIN): $(SRC) src/main.c

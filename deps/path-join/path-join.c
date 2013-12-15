@@ -8,9 +8,9 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "str-ends-with.h"
-#include "str-starts-with.h"
-#include "path-join.h"
+#include "str-ends-with/str-ends-with.h"
+#include "str-starts-with/str-starts-with.h"
+#include "path-join/path-join.h"
 
 #ifdef _WIN32
 #define PATH_JOIN_SEPERATOR   "\\"

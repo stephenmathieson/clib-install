@@ -1,15 +1,11 @@
 {
   "name": "clib-install",
+  "repo": "stephenmathieson/clib-install",
   "version": "0.0.1",
   "install": "make install",
   "dependencies": {
     "clibs/commander": "master",
     "jwerle/fs.c": "master",
-    "stephenmathieson/http-get.c": "master",
-    "stephenmathieson/parse-repo.c": "master",
-    "stephenmathieson/mkdirp.c": "master",
-    "stephenmathieson/path-join.c": "master",
-    "stephenmathieson/str-replace.c": "master",
-    "kgabis/parson": "master"
+    "stephenmathieson/clib-package": "master"
   }
 }

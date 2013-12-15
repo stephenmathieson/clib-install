@@ -9,16 +9,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "fs/fs.h"
+#include "commander/commander.h"
+#include "clib-package/clib-package.h"
+#include "clib-binary.h"
 #include "clib-install.h"
-#include "fs.h"
-#include "commander.h"
-#include "package.h"
-#include "parse-repo.h"
-
 
 // global opts
 struct options {
   const char *dir;
+  int verbose;
 };
 
 static struct options opts;
@@ -27,16 +27,22 @@ static struct options opts;
  * Option setters
  */
 
-static void setopt_dir(command_t *self) {
+static void
+setopt_dir(command_t *self) {
   opts.dir = (char *) self->arg;
 }
 
+static void
+setopt_quite(command_t *self) {
+  opts.verbose = 0;
+}
 
 /**
  * Install dependencies of the package at ./
  */
 
-static int install_local_pkg() {
+static int
+install_local_pkg() {
   if (-1 == fs_exists("./package.json")) {
     fprintf(stderr, "Missing package.json\n");
     return 1;
@@ -45,16 +51,17 @@ static int install_local_pkg() {
   char *json = fs_read("./package.json");
   if (NULL == json) return 1;
 
-  package_t *pkg = package_from_json(json);
-  if (!pkg) {
-    fprintf(stderr, "Could not create package.  Perhaps package.json is malformed?\n");
+  clib_package_t *pkg = clib_package_new(json, opts.verbose);
+  if (NULL == pkg) {
+    free(json);
     return 1;
   }
 
-  int rc = package_install_dependencies(pkg, opts.dir);
-  if (-1 == rc) fprintf(stderr, "Could not install local dependencies\n");
+  int rc = clib_package_install_dependencies(pkg, opts.dir, opts.verbose);
 
-  free(pkg);
+  free(json);
+  clib_package_free(pkg);
+
   return -1 == rc ? 1 : 0;
 }
 
@@ -62,15 +69,24 @@ static int install_local_pkg() {
  * Install `n` of the given `pkgs` (args)
  */
 
-static int install_packages(int n, const char **pkgs) {
+static int
+install_packages(int n, const char **pkgs) {
   for (int i = 0; i < n; i++) {
-    parsed_repo_t *repo = parse_repo(pkgs[i]);
-    package_t *pkg = package_from_repo(repo->slug, repo->version);
-    if (!pkg) return 1;
-    int rc = package_install(pkg, opts.dir);
-    free(pkg);
-    parse_repo_free(repo);
-    if (-1 == rc) return 1;
+    clib_package_t *pkg = clib_package_new_from_slug(pkgs[i], opts.verbose);
+    if (NULL == pkg) {
+      return 1;
+    }
+
+    int rc;
+    if (pkg->install) {
+      rc = clib_package_install_binary(pkg, opts.verbose);
+    } else {
+      rc = clib_package_install(pkg, opts.dir, opts.verbose);
+      clib_package_free(pkg);
+    }
+    if (-1 == rc) {
+      return 1;
+    }
   }
 
   return 0;
@@ -80,7 +96,11 @@ static int install_packages(int n, const char **pkgs) {
  * Entry point
  */
 
-int main(int argc, const char **argv) {
+int
+main(int argc, const char **argv) {
+  opts.dir = "./deps";
+  opts.verbose = 1;
+
   command_t program;
   command_init(&program, "clib-install", CLIB_INSTALL_VERSION);
 
@@ -91,9 +111,13 @@ int main(int argc, const char **argv) {
     , "--out <dir>"
     , "change the output directory [deps]"
     , setopt_dir);
+  command_option(&program
+    , "-q"
+    , "--quite"
+    , "disable verbose output"
+    , setopt_quite);
   command_parse(&program, argc, argv);
 
-  if (!opts.dir) opts.dir = "./deps";
   if (0 == program.argc) return install_local_pkg();
 
   return install_packages(program.argc, program.argv);

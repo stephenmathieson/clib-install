@@ -6,8 +6,8 @@
 // MIT licensed
 //
 
-#ifndef __CLIB_INSTALL_H__
-#define __CLIB_INSTALL_H__ 1
+#ifndef CLIB_INSTALL_H
+#define CLIB_INSTALL_H 1
 
 #define CLIB_INSTALL_VERSION "0.0.1"
 

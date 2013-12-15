@@ -37,6 +37,10 @@
 
     $ clib-install ms@0.0.3 file
 
+  Install stephenmathieson/trim.c, along with its development dependencies
+
+    $ clib-install stephenmathieson/trim.c --dev
+
 ## License
 
   MIT

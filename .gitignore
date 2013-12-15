@@ -3,3 +3,4 @@ clib-install
 test/http-get
 test/package
 google.html
+tmp/

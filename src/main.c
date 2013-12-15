@@ -19,6 +19,7 @@
 struct options {
   const char *dir;
   int verbose;
+  int dev;
 };
 
 static struct options opts;
@@ -35,6 +36,12 @@ setopt_dir(command_t *self) {
 static void
 setopt_quite(command_t *self) {
   opts.verbose = 0;
+}
+
+
+static void
+setopt_dev(command_t *self) {
+  opts.dev = 1;
 }
 
 /**
@@ -60,9 +67,20 @@ install_local_pkg() {
   int rc = clib_package_install_dependencies(pkg, opts.dir, opts.verbose);
 
   free(json);
-  clib_package_free(pkg);
 
-  return -1 == rc ? 1 : 0;
+  if (-1 == rc) {
+    clib_package_free(pkg);
+    return 1;
+  }
+
+  if (opts.dev) {
+    rc = clib_package_install_development(pkg, opts.dir, opts.verbose);
+  }
+
+  clib_package_free(pkg);
+  return -1 == rc
+    ? 1
+    : 0;
 }
 
 /**
@@ -73,20 +91,26 @@ static int
 install_packages(int n, const char **pkgs) {
   for (int i = 0; i < n; i++) {
     clib_package_t *pkg = clib_package_new_from_slug(pkgs[i], opts.verbose);
-    if (NULL == pkg) {
-      return 1;
-    }
+    if (NULL == pkg) return 1;
 
     int rc;
     if (pkg->install) {
       rc = clib_package_install_binary(pkg, opts.verbose);
     } else {
       rc = clib_package_install(pkg, opts.dir, opts.verbose);
+
+      if (-1 == rc) {
+        clib_package_free(pkg);
+        return 1;
+      }
+
+      if (opts.dev) {
+        rc = clib_package_install_development(pkg, opts.dir, opts.verbose);
+      }
+
       clib_package_free(pkg);
     }
-    if (-1 == rc) {
-      return 1;
-    }
+    if (-1 == rc) return 1;
   }
 
   return 0;
@@ -100,6 +124,7 @@ int
 main(int argc, const char **argv) {
   opts.dir = "./deps";
   opts.verbose = 1;
+  opts.dev = 0;
 
   command_t program;
   command_init(&program, "clib-install", CLIB_INSTALL_VERSION);
@@ -116,6 +141,11 @@ main(int argc, const char **argv) {
     , "--quite"
     , "disable verbose output"
     , setopt_quite);
+  command_option(&program
+    , "-d"
+    , "--dev"
+    , "install development dependencies"
+    , setopt_dev);
   command_parse(&program, argc, argv);
 
   if (0 == program.argc) return install_local_pkg();

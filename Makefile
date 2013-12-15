@@ -6,16 +6,12 @@ CFLAGS = -std=c99 -Wall -Ideps -Isrc
 LDFLAGS = -lcurl
 SRC = $(filter-out src/main.c, $(wildcard src/*.c))
 SRC += $(wildcard deps/*/*.c)
-TESTS = $(wildcard test/*.c)
 
 $(BIN): $(SRC) src/main.c
 	$(CC) $^ $(CFLAGS) $(LDFLAGS) -o $(BIN)
 
-test: $(TESTS)
-
-$(TESTS):
-	$(CC) $@ $(SRC) $(CFLAGS) $(LDFLAGS) -o $(basename $@)
-	./$(basename $@)
+test: clean $(BIN)
+	./$(BIN) --out tmp --dev --quite stephenmathieson/clib-package visionmedia/mon
 
 clean:
 	rm -f $(BIN)
@@ -28,4 +24,4 @@ install: $(BIN)
 uninstall:
 	rm -f $(PREFIX)/bin/$(BIN)
 
-.PHONY: test $(TESTS) clean install uninstall
+.PHONY: test clean install uninstall
